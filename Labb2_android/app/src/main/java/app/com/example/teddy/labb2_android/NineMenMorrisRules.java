@@ -1,10 +1,12 @@
 package app.com.example.teddy.labb2_android;
 
+import android.util.Log;
+
 import java.util.Arrays;
 
 /**
- * @author Jonas Wåhslén, jwi@kth.se. 
- * Revised by Anders Lindström, anderslm@kth.se
+ * @author Jonas Wï¿½hslï¿½n, jwi@kth.se. 
+ * Revised by Anders Lindstrï¿½m, anderslm@kth.se
  * Modified by: Carlos Galdo & Teddy Chavez
  */
 
@@ -16,12 +18,12 @@ public class NineMenMorrisRules {
 	public static final int WHITE_MOVES = 1;
 	public static final int BLACK_MOVES = 2;
 
-	public static final int EMPTY_SPACE = 0;
+	public static final int EMPTY_SPACE = -1;
 	public static final int WHITE_MARKER = 4;
 	public static final int BLACK_MARKER = 5;
 
 	public NineMenMorrisRules() {
-		gameplan = new int[25]; // zeroes
+		gameplan = new int[24]; // zeroes
 		Arrays.fill(gameplan, -1);
 		whitemarker = 9;
 		blackmarker = 9;
@@ -32,10 +34,14 @@ public class NineMenMorrisRules {
 	 * Returns true if a move is successful
 	 */
 	public boolean legalMove(int To, int From, int color) {
+		Log.v("In legalMove", "to =" + To+ " From=" + From + " color="+color + " turn=" + turn);
 		if (color == turn) {
 			if (turn == BLACK_MOVES) {
+				Log.v("Turns==BLACK_MOVEs", "YES");
 				if (blackmarker > 0) {
+					Log.v("blackmarker>0", "YES" + "gameplan[TO] = " + gameplan[To] + "empty_space==" + EMPTY_SPACE);
 					if (gameplan[To] == EMPTY_SPACE) {
+						Log.v("gamepla[To]==empty", "YES");
 						gameplan[To] = BLACK_MARKER;
 						blackmarker--;
 						turn = WHITE_MOVES;
@@ -257,4 +263,6 @@ public class NineMenMorrisRules {
 	public int getAmountOfWhiteCheckers() {return this.whitemarker;}
 
 	public int getAmountOfBlackCheckers(){return this.blackmarker;}
+
+
 }
