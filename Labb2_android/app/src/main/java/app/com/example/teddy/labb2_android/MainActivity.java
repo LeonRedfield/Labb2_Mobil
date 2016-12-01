@@ -106,14 +106,15 @@ public class MainActivity extends AppCompatActivity {
                     checkerRemoved = result;
                     remove = false;
                     move = true;
-                    Log.v("toRemove=", "=" + checkerRemoved);
+                    Log.v("toRemove=", "=" + checkerRemoved + "color="+color);
                     if(nineMenMorrisRules.win(color))
                     {
                         Toast.makeText(this,((nineMenMorrisRules.getTurn()==1)?"black's the Winner":"whites's the Winner"), Toast.LENGTH_LONG);
                         Log.v("winn!!","!!!!!");
-                        Intent intent = getIntent();
-                        finish();
-                        startActivity(intent);
+                        Intent i = getBaseContext().getPackageManager()
+                                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(i);
                     }
                 }
                 else

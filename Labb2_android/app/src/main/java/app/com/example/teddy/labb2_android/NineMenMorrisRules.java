@@ -95,7 +95,7 @@ public class NineMenMorrisRules {
 	 * Returns true if position "to" is part of three in a row.
 	 */
 	public boolean remove(int to) {
-
+		if(gameplan[to]<0){return false;}
 		if ((to == 16 || to == 17 || to == 18) && gameplan[16] == gameplan[17]
 				&& gameplan[17] == gameplan[18]) {
 			return true;
@@ -184,12 +184,12 @@ public class NineMenMorrisRules {
 	public boolean win(int color) {
 		int countMarker = 0;
 		int count = 0;
-		while (count <= 23) {
-			if (gameplan[count] != EMPTY_SPACE && gameplan[count] != color)
+		while (count < 23) {
+			if (gameplan[count] == color)
 				countMarker++;
 			count++;
 		}
-		if (whitemarker <= 0 && blackmarker <= 0 && countMarker < 3)
+		if (whitemarker <= 0 && blackmarker <= 0 && countMarker <= 3)
 			return true;
 		else
 			return false;
@@ -211,7 +211,7 @@ public class NineMenMorrisRules {
 	 * Check whether this is a legal move.
 	 */
 	private boolean isValidMove(int to, int from) {
-		
+		if(to<0||from<0){return false;}
 		if(this.gameplan[to] != EMPTY_SPACE) return false;
 		
 		switch (to) {
