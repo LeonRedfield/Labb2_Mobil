@@ -54,12 +54,15 @@ public class NineMensMorrisGameLayout extends View {
     boolean mainPhaseW;
     boolean mainPhaseB;
 
+    int [][] playerPositions;
+
 
     public NineMensMorrisGameLayout(Context context) {
         super(context);
         setBackgroundResource(R.drawable.ninemenboard);
         player1Checkers = new float[9][2];
         player2Checkers = new float[9][2];
+        playerPositions = new int[2][9];
         dotsXAndY = new float[26][2];
         for(float[] checker : player1Checkers)
         {
@@ -75,10 +78,9 @@ public class NineMensMorrisGameLayout extends View {
     }
 
 
-
     private void initScreenSize() {
-        this.screenHeight = getHeight();
-        this.screenWidth = getWidth();
+        //this.screenHeight = getHeight();
+        //this.screenWidth = getWidth();
     }
 
     public void initCheckersDefaultPos()
@@ -115,9 +117,17 @@ public class NineMensMorrisGameLayout extends View {
         }
     }
 
+    /*
+    public void setWidth(int w){
+        this.screenWidth = w;
+    }
+    public void setHeight(int h) {
+        this.screenHeight = h;
+    }*/
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
         screenHeight = getHeight();
         screenWidth = getWidth();
 
@@ -154,6 +164,7 @@ public class NineMensMorrisGameLayout extends View {
 
     private void drawNineBoard(int screenConstant, Canvas canvas)
     {
+
         canvas.drawRect(outerRectangle, blackPaintBrush);
         canvas.drawRect(middleRect, blackPaintBrush);
         canvas.drawRect(innerRect, blackPaintBrush);
@@ -168,20 +179,37 @@ public class NineMensMorrisGameLayout extends View {
 
         }
 
+        Log.v("Writing out dots"," before checkers draw coordinates: ");
+        for(int i = 0; i < dotsXAndY.length; i++) {
+            Log.v("dotsXandY: ", i +": x=" +dotsXAndY[i][0] + " y="+dotsXAndY[i][1]);
+        }
+        for(int i = 0; i < player1Checkers.length; i++) {
+            Log.v("player 1 coords", " x=" +player1Checkers[i][0] +" y=" +player1Checkers[i][1]);
+        }
+
         for(int i=0;i<player1Checkers.length;i++)
         {
-
-            if(player1Checkers[i][0] > 0)
+            if(playerPositions[0][i] >= 0)
             {
                 //Log.v("drawing","=" +player1Checkers[i][0] + "index =" + i);
-                canvas.drawCircle( player1Checkers[i][0] , player1Checkers[i][1], (float)(screenConstant*0.05),blackPaintBrushFill);
+                canvas.drawCircle( dotsXAndY[playerPositions[0][i]][0], dotsXAndY[playerPositions[0][i]][1], (float)(screenConstant*0.05),blackPaintBrushFill);
             }
-            if(player2Checkers[i][0]>0)
+            else {
+                canvas.drawCircle( dotsXAndY[24][0], dotsXAndY[24][1],(float)(screenConstant*0.05),blackPaintBrushFill);
+            }
+            if(playerPositions[1][i]>=0)
             {
                 //Log.v("drawing","WHIT=" +player2Checkers[i][0] + "index =" + i);
-                canvas.drawCircle( player2Checkers[i][0] ,player2Checkers[i][1], (float)(screenConstant*0.05),whitePaintBrushFill);
+                canvas.drawCircle( dotsXAndY[playerPositions[1][i]][0] ,dotsXAndY[playerPositions[1][i]][1], (float)(screenConstant*0.05),whitePaintBrushFill);
             }
+            else {
+                canvas.drawCircle( dotsXAndY[25][0], dotsXAndY[25][1],(float)(screenConstant*0.05),whitePaintBrushFill);
+            }
+
         }
+    }
+    public void setPlayerPositions(int[][] p){
+        this.playerPositions = p;
     }
 
     private void initLines()
@@ -224,7 +252,7 @@ public class NineMensMorrisGameLayout extends View {
         float middleX = verticalStartAndStopX;
         float middleY = horizontalStartAndStopY;
 
-                float[][] cyAndcyTemp = { {outerLeft,outerTop},{middleX,outerTop}, {outerRight,outerTop},
+                dotsXAndY = new float[][]{ {outerLeft,outerTop},{middleX,outerTop}, {outerRight,outerTop},
                 {outerRight,middleY}, { outerBottom,outerRight},
                 {middleX,outerBottom},{outerLeft,outerBottom},
                 {outerLeft,middleY},
@@ -239,8 +267,15 @@ public class NineMensMorrisGameLayout extends View {
                 {middleX,innerBottom},{innerLeft,innerBottom},
                 {innerLeft,middleY},{0,0} ,{0,0}
         };
-        dotsXAndY = cyAndcyTemp;
+
+        //dotsXAndY = cyAndcyTemp;
         initDefaultCheckerPos();
+        Log.v("Writing out dot", "coordinates: ");
+        for(int i = 0; i < dotsXAndY.length; i++) {
+            Log.v("dotsXandY: ", i +": x=" +dotsXAndY[i][0] + " y="+dotsXAndY[i][1]);
+        }
+
+
     }
 
     public int getAvailablePos(float posX, float posY) {
@@ -286,22 +321,26 @@ public class NineMensMorrisGameLayout extends View {
         if(width < height)
         {
             dotsXAndY[dotsXAndY.length-1][0] = (float)(screenConstant*0.2);
-            dotsXAndY[dotsXAndY.length-1][1] = (float) (highestSize*0.65);
+            dotsXAndY[dotsXAndY.length-1][1] = (float) (highestSize*0.8);
 
             dotsXAndY[dotsXAndY.length-2][0] = (float)(screenConstant*0.8);
-            dotsXAndY[dotsXAndY.length-2][1] = (float) (highestSize*0.65);
+            dotsXAndY[dotsXAndY.length-2][1] = (float) (highestSize*0.8);
         }
         else {
-            dotsXAndY[dotsXAndY.length-1][0] = (float)(width*0.65);
+            dotsXAndY[dotsXAndY.length-1][0] = (float)(width*0.8);
             dotsXAndY[dotsXAndY.length-1][1] = (float) (height*0.8);
 
-            dotsXAndY[dotsXAndY.length-2][0] = (float)(highestSize*0.65);
+            dotsXAndY[dotsXAndY.length-2][0] = (float)(highestSize*0.8);
             dotsXAndY[dotsXAndY.length-2][1] = (float) (screenConstant*0.2);
         }
     }
 
     public void drawCheckers(int[] whiteCheckers , int[] blackCheckers) {
 
+        for(int i = 0; i < 9; i++){
+            playerPositions[1][i] = whiteCheckers[i];
+            playerPositions[0][i] = blackCheckers[i];
+        }
         //här är rätt
         initLines();
         initBoardDots();
@@ -323,6 +362,7 @@ public class NineMensMorrisGameLayout extends View {
             {
                 player2Checkers[i][0] = dotsXAndY[whiteCheckers[i]][0];
                 player2Checkers[i][1] = dotsXAndY[whiteCheckers[i]][1];
+                playerPositions[0][i] = blackCheckers[i];
                 //Log.v("inDrawChecks", "wX="+ player2Checkers[i][0] + "wY=" +player2cheskYPos);
             }
             if(blackCheckers[i] >=0)
@@ -330,6 +370,7 @@ public class NineMensMorrisGameLayout extends View {
                 //Log.v("i=",""+i+" colorBLACK =" + blackCheckers[i]);
                 player1Checkers[i][0] = dotsXAndY[blackCheckers[i]][0];
                 player1Checkers[i][1] = dotsXAndY[blackCheckers[i]][1];
+                playerPositions[1][i] = whiteCheckers[i];
             }
         }
         invalidate();

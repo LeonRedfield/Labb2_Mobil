@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Point;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,13 +34,17 @@ public class MainActivity extends AppCompatActivity {
     boolean move;
     boolean remove;
     int checkerRemoved;
-    boolean rotation;
+    boolean init;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        Log.v("OnCreate", "yes!");
-        nineMensActivityLayout = new NineMensMorrisGameLayout(this);
+        Log.v("OnCreate", "yes! init = " +init);
+        if(!init) {
+            nineMensActivityLayout = new NineMensMorrisGameLayout(this);
+            init = true;
+        }
         setContentView(nineMensActivityLayout);
         initScreenSize();
         nineMenMorrisRules = new NineMenMorrisRules();
@@ -56,18 +61,46 @@ public class MainActivity extends AppCompatActivity {
     private void initScreenSize() {
         this.width = getResources().getDisplayMetrics().widthPixels;
         this.height = getResources().getDisplayMetrics().heightPixels;
+        //nineMensActivityLayout.setWidth(width);
+        //nineMensActivityLayout.setHeight(height);
     }
+
+
 
     @Override
     protected void onResume() {
         super.onResume();
         showPlayersTurn(color);
         Log.v("onRESUME", "yes");
-        //initScreenSize();
-        //nineMensActivityLayout.updateScreen(whiteCheckers, blackCheckers);
-        // Obtain MotionEvent object
+        initScreenSize();
+        nineMensActivityLayout.updateScreen(whiteCheckers, blackCheckers);
+        setContentView(nineMensActivityLayout);
+        long downTime = SystemClock.uptimeMillis();
+        long eventTime = SystemClock.uptimeMillis() + 100;
+        float x = 0.0f;
+        float y = 0.0f;
+        // List of meta states found here:     developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
+        int metaState = 0;
+        MotionEvent motionEvent = MotionEvent.obtain(
+                downTime,
+                eventTime,
+                MotionEvent.ACTION_UP,
+                x,
+                y,
+                metaState
+        );
+        this.dispatchTouchEvent(motionEvent);
+
     }
 
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.v("OnRestart: "," restarting...");
+
+
+    }
 
     @Override
     protected void onStart() {
@@ -76,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         {
             nineMensActivityLayout.drawCheckers(whiteCheckersBackUp, blackCheckersBackUp);
         }
+
     }
 
     private void updateView()
@@ -91,15 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
 // List of meta states found here:     developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
         int metaState = 0;
-        MotionEvent motionEvent = MotionEvent.obtain(
-                downTime,
-                eventTime,
-                MotionEvent.ACTION_UP,
-                x,
-                y,
-                metaState
-        );
-        this.dispatchTouchEvent(motionEvent);
+
         Log.v("updateScreen","!!!!!!!!!!!!!!!!!!1");
     }
 
@@ -107,9 +133,10 @@ public class MainActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE || newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            //initScreenSize();
-            //updateView();
-
+            Log.v("onConfCh..", "changed to: w=" +nineMensActivityLayout.getHeight() +" w=" +nineMensActivityLayout.getWidth());
+            initScreenSize();
+            //nineMensActivityLayout.setHeight(height);
+            //nineMensActivityLayout.setWidth(width);
         }
     }
 
@@ -126,19 +153,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         if(event.getAction() == MotionEvent.ACTION_UP)
         {
             Log.v("Touch UP", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
             move = false;
             Arrays.fill(whiteCheckers, -1);
             Arrays.fill(blackCheckers, -1);
-           Toast.makeText(this, ((nineMenMorrisRules.getTurn()==1)?"white's turn":"black's turn"), Toast.LENGTH_SHORT);
+            Toast.makeText(this, ((nineMenMorrisRules.getTurn()==1)?"white's turn":"black's turn"), Toast.LENGTH_SHORT);
             initScreenSize();
             float viewX =  event.getX()-(width-nineMensActivityLayout.getWidthSize());
             float viewY = event.getY()-(height-nineMensActivityLayout.getHeightSize());
-
 
             int result = nineMensActivityLayout.getAvailablePos(viewX,viewY);
 
@@ -199,45 +228,39 @@ public class MainActivity extends AppCompatActivity {
                 remove = true;
                 Toast.makeText(this,"3 in a row remove any oponent checker",Toast.LENGTH_SHORT);
             }
-                    if(move)
-                    {
-                        Log.v("board from", " =  " + from + " TO=" + result);
+             Log.v("board from", " =  " + from + " TO=" + result);
+            int i = 0;
+            int white_index = 0;
+            int black_index = 0;
+            for (int checker : nineMenMorrisRules.getGameplan()) {
+                //Log.v("checker =", "" + checker + " i="+i);
+                if (checker == 4) //WHITE_MARKER
+                {
+                    whiteCheckers[white_index] = i;
+                    // Log.v("white_c", "="+ whiteCheckers[white_index] + "i="+i + "Windex="+white_index);
+                    white_index++;
+                } else if (checker == 5)//BLACK_MARKER
+                {
+                    blackCheckers[black_index] = i;
+                    // Log.v("black_c", "="+ blackCheckers[black_index] + "i="+i+"bindex=" + black_index);
+                    black_index++;
+                }
 
-                        int i = 0;
-                        int white_index = 0;
-                        int black_index = 0;
+                i++;
+            }
+            whiteCheckersBackUp = whiteCheckers;
+            blackCheckersBackUp = blackCheckers;
 
-                        for (int checker : nineMenMorrisRules.getGameplan()) {
-                            //Log.v("checker =", "" + checker + " i="+i);
-                            if (checker == 4) //WHITE_MARKER
-                            {
-                                whiteCheckers[white_index] = i;
-                                // Log.v("white_c", "="+ whiteCheckers[white_index] + "i="+i + "Windex="+white_index);
-                                white_index++;
-                            } else if (checker == 5)//BLACK_MARKER
-                            {
-                                blackCheckers[black_index] = i;
-                                // Log.v("black_c", "="+ blackCheckers[black_index] + "i="+i+"bindex=" + black_index);
-                                black_index++;
-                            }
+            if(nineMenMorrisRules.getAmountOfWhiteCheckers() == 0)
+            {
+                nineMensActivityLayout.setMainPhaseWhitePlayer();
+            }
+            if( nineMenMorrisRules.getAmountOfBlackCheckers() ==  0)
+            {
+                nineMensActivityLayout.setMainPhaseBlackPlayer();
+            }
 
-                            i++;
-                        }
-                        whiteCheckersBackUp = whiteCheckers;
-                        blackCheckersBackUp = blackCheckers;
-
-                        if(nineMenMorrisRules.getAmountOfWhiteCheckers() == 0)
-                        {
-                            nineMensActivityLayout.setMainPhaseWhitePlayer();
-                        }
-                        if( nineMenMorrisRules.getAmountOfBlackCheckers() ==  0)
-                        {
-                            nineMensActivityLayout.setMainPhaseBlackPlayer();
-                        }
-                        nineMensActivityLayout.drawCheckers(whiteCheckers, blackCheckers);
-
-                    }
-
+            nineMensActivityLayout.drawCheckers(whiteCheckers, blackCheckers);
         }
         return super.onTouchEvent(event);
     }
