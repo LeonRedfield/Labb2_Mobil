@@ -35,24 +35,26 @@ public class NineMenMorrisRules {
 	 */
 	public boolean legalMove(int To, int From, int color) {
 		Log.v("In legalMove", "to =" + To+ " From=" + From + " color="+color + " turn=" + turn);
-		if (color == turn) {
+		if (color == turn && To >=0) {
 			if (turn == BLACK_MOVES) {
-				Log.v("Turns==BLACK_MOVEs", "YES");
+				//Log.v("Turns==BLACK_MOVEs", "YES");
 				if (blackmarker > 0) {
-					Log.v("blackmarker>0", "YES" + "gameplan[TO] = " + gameplan[To] + "empty_space==" + EMPTY_SPACE);
+					//Log.v("blackmarker>0", "YES" + "gameplan[TO] = " + gameplan[To] + "empty_space==" + EMPTY_SPACE);
 					if (gameplan[To] == EMPTY_SPACE) {
-						Log.v("gamepla[To]==empty", "YES");
+						//Log.v("gamepla[To]==empty", "YES");
 						gameplan[To] = BLACK_MARKER;
 						blackmarker--;
+
 						turn = WHITE_MOVES;
 						return true;
 					}
 				}
 				/*else*/
-				if (gameplan[To] == EMPTY_SPACE) {
+				if (gameplan[To] == EMPTY_SPACE && gameplan[From] == BLACK_MARKER) {
 					boolean valid = isValidMove(To, From);
 					if (valid == true) {
 						gameplan[To] = BLACK_MARKER;
+						gameplan[From] = EMPTY_SPACE;
 						turn = WHITE_MOVES;
 						return true;
 					} else {
@@ -70,10 +72,11 @@ public class NineMenMorrisRules {
 						return true;
 					}
 				}
-				if (gameplan[To] == EMPTY_SPACE) {
+				if (gameplan[To] == EMPTY_SPACE && gameplan[From] == WHITE_MARKER) {
 					boolean valid = isValidMove(To, From);
 					if (valid == true) {
 						gameplan[To] = WHITE_MARKER;
+						gameplan[From] = EMPTY_SPACE;
 						turn = BLACK_MOVES;
 						return true;
 					} else {
@@ -163,8 +166,12 @@ public class NineMenMorrisRules {
 	 * Request to remove a marker for the selected player.
 	 * Returns true if the marker where successfully removed
 	 */
-	public boolean remove(int From, int color) {
-		if (gameplan[From] == color) {
+	public boolean remove(int From, int marker) {
+		if(From >= 0)
+		{
+			Log.v("gameFRom", "="+gameplan[From]);
+		}
+		if (From >= 0 && gameplan[From] == marker) {
 			gameplan[From] = EMPTY_SPACE;
 			return true;
 		} else
@@ -264,5 +271,27 @@ public class NineMenMorrisRules {
 
 	public int getAmountOfBlackCheckers(){return this.blackmarker;}
 
+	public int getTurn()
+	{
+		return this.turn;
+	}
+
+	public int getPlayerWithZone(int zone)
+	{
+		Log.v("zone=",""+zone);
+		if(zone <0 || zone >= gameplan.length)
+		{
+			return -1;
+		}
+		if(gameplan[zone] == 4)
+		{
+			return 1;
+		}
+		else if(gameplan[zone] ==5)
+		{
+			return 2;
+		}
+		return -1;
+	}
 
 }
