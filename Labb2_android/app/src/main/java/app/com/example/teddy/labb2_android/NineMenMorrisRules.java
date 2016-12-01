@@ -2,6 +2,7 @@ package app.com.example.teddy.labb2_android;
 
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Arrays;
  * Modified by: Carlos Galdo & Teddy Chavez
  */
 
-public class NineMenMorrisRules {
+public class NineMenMorrisRules implements Serializable{
 	private int[] gameplan;
 	private int whitemarker, blackmarker;
 	private int turn; // player in turn
@@ -35,7 +36,7 @@ public class NineMenMorrisRules {
 	 */
 	public boolean legalMove(int To, int From, int color) {
 		Log.v("In legalMove", "to =" + To+ " From=" + From + " color="+color + " turn=" + turn);
-		if (color == turn && To >=0) {
+		if (color == turn && To >=0 && To <24) {
 			if (turn == BLACK_MOVES) {
 				//Log.v("Turns==BLACK_MOVEs", "YES");
 				if (blackmarker > 0) {
@@ -294,4 +295,16 @@ public class NineMenMorrisRules {
 		return -1;
 	}
 
+	public int getAnyCheckerInBoard() {
+		int  i=0;
+		for (int node : gameplan)
+		{
+			if(node == 5 || node == 4)
+			{
+				return i;
+			}
+			i++;
+		}
+		return -1;
+	}
 }

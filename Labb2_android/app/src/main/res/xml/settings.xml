@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:title="newGame"
+        android:id="@+id/newGame"
+        android:key="@string/newGame"
+        android:summary="New game">
+    </Preference>
+</PreferenceScreen>

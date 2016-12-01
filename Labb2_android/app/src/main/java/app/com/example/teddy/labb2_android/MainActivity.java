@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,11 +24,16 @@ public class MainActivity extends AppCompatActivity {
     private boolean fromSelected;
     private int from;
     private int color;
+    private int oldHeight;
+    private int oldWidth;
     int[] whiteCheckers;
     int[] blackCheckers;
+    int[] whiteCheckersBackUp;
+    int[] blackCheckersBackUp;
     boolean move;
     boolean remove;
     int checkerRemoved;
+    boolean rotation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,26 +51,67 @@ public class MainActivity extends AppCompatActivity {
         color = nineMenMorrisRules.getTurn();
         checkerRemoved = -1;
         //fromSelected = false;
-
     }
 
     private void initScreenSize() {
-        Display display = ((WindowManager)this.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        this.width = size.x;
-        this.height = size.y;
+        this.width = getResources().getDisplayMetrics().widthPixels;
+        this.height = getResources().getDisplayMetrics().heightPixels;
     }
 
     @Override
-    protected void onStart() {
+    protected void onResume() {
         super.onResume();
         showPlayersTurn(color);
         Log.v("onRESUME", "yes");
-        initScreenSize();
-        nineMensActivityLayout.updateScreen(whiteCheckers, blackCheckers);
+        //initScreenSize();
+        //nineMensActivityLayout.updateScreen(whiteCheckers, blackCheckers);
+        // Obtain MotionEvent object
     }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(whiteCheckersBackUp != null && blackCheckersBackUp !=null)
+        {
+            nineMensActivityLayout.drawCheckers(whiteCheckersBackUp, blackCheckersBackUp);
+        }
+    }
+
+    private void updateView()
+    {
+        long downTime = 100;
+        long eventTime = 100;
+        int nodeWithChecker = nineMenMorrisRules.getAnyCheckerInBoard();
+        Log.v("node","="+nodeWithChecker);
+        float[] coor = nineMensActivityLayout.getCoordinatesFromNode(24);
+        Log.v("coor"," X="+coor[0]+" Y="+coor[1]);
+        float x = coor[0];
+        float y = coor[1];
+
+// List of meta states found here:     developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
+        int metaState = 0;
+        MotionEvent motionEvent = MotionEvent.obtain(
+                downTime,
+                eventTime,
+                MotionEvent.ACTION_UP,
+                x,
+                y,
+                metaState
+        );
+        this.dispatchTouchEvent(motionEvent);
+        Log.v("updateScreen","!!!!!!!!!!!!!!!!!!1");
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE || newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            //initScreenSize();
+            //updateView();
+
+        }
+    }
 
 
     private void showPlayersTurn(int color)
@@ -82,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_UP)
         {
+            Log.v("Touch UP", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
             move = false;
             Arrays.fill(whiteCheckers, -1);
             Arrays.fill(blackCheckers, -1);
@@ -111,10 +160,7 @@ public class MainActivity extends AppCompatActivity {
                     {
                         Toast.makeText(this,((nineMenMorrisRules.getTurn()==1)?"black's the Winner":"whites's the Winner"), Toast.LENGTH_LONG);
                         Log.v("winn!!","!!!!!");
-                        Intent i = getBaseContext().getPackageManager()
-                                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(i);
+                        restartActivity();
                     }
                 }
                 else
@@ -177,7 +223,8 @@ public class MainActivity extends AppCompatActivity {
 
                             i++;
                         }
-
+                        whiteCheckersBackUp = whiteCheckers;
+                        blackCheckersBackUp = blackCheckers;
 
                         if(nineMenMorrisRules.getAmountOfWhiteCheckers() == 0)
                         {
@@ -193,5 +240,44 @@ public class MainActivity extends AppCompatActivity {
 
         }
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.settings_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id==R.id.settings)
+        {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        GameSaver saver = new GameSaver(this);
+        saver.saveGame(nineMenMorrisRules);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        GameSaver loader = new GameSaver(this);
+        this.nineMenMorrisRules = loader.loadGame();
+    }
+
+    public void restartActivity()
+    {
+        Intent i = getBaseContext().getPackageManager()
+                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
     }
 }

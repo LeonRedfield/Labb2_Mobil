@@ -75,6 +75,7 @@ public class NineMensMorrisGameLayout extends View {
     }
 
 
+
     private void initScreenSize() {
         this.screenHeight = getHeight();
         this.screenWidth = getWidth();
@@ -133,6 +134,7 @@ public class NineMensMorrisGameLayout extends View {
 
 
 
+
     private void initPaint(int tmp)
     {
         blackPaintBrush = new Paint();
@@ -163,8 +165,8 @@ public class NineMensMorrisGameLayout extends View {
         for(int i = 0; i< dotsXAndY.length-2; i++)
         {
             canvas.drawCircle(dotsXAndY[i][0], dotsXAndY[i][1],(float) (screenConstant*0.01), blackPaintBrush);
-        }
 
+        }
 
         for(int i=0;i<player1Checkers.length;i++)
         {
@@ -338,5 +340,15 @@ public class NineMensMorrisGameLayout extends View {
         Log.v("!!!!HEIGHT= ", " ="+getHeight()+" WIDHT="+getWidth());
         Log.v("!!!!h= ", " ="+screenHeight+" w=" +screenWidth);
         drawCheckers(whiteCheckers, blackCheckers);
+    }
+
+    public float[] getCoordinatesFromNode(int index)
+    {
+        if(index >= 0)
+        {
+            float[] result = {dotsXAndY[index][0],dotsXAndY[index][1]};
+            return result;
+        }
+        return new float[] {0,0};
     }
 }
