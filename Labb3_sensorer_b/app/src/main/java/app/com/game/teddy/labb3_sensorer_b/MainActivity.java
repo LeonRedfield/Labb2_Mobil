@@ -1,12 +1,23 @@
 package app.com.game.teddy.labb3_sensorer_b;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
@@ -28,6 +39,10 @@ public class MainActivity extends Activity {
 			showToast("This device do not support Bluetooth");
 			this.finish();
 		}
+
+		//Android example
+
+
 	}
 
 	@Override

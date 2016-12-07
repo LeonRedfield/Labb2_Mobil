@@ -3,6 +3,7 @@ package app.com.game.teddy.labb3_sensorer_b;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -15,6 +16,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
@@ -42,7 +45,11 @@ class PollDataTask extends AsyncTask<Void, Void, String> {
 		adapter.cancelDiscovery();
 
 		BluetoothSocket socket = null;
-		FileOutputStream fos = null;
+
+		OutputStream fos = null;
+		File path = Environment.getExternalStoragePublicDirectory(
+				Environment.DIRECTORY_DOWNLOADS);
+		File file = new File(path, "TestFil.txt");
 		PrintWriter pr = null;
 		try {
 			socket = noninDevice
@@ -59,21 +66,16 @@ class PollDataTask extends AsyncTask<Void, Void, String> {
 
 			OutputStreamWriter osw = null;
 			if (reply[0] == ACK) {
-				fos = null;
-				pr = null;
 				try {
-					File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "data.txt");
-					if(!path.exists()) {
-						Log.v("Did not" , "exist");
-						path.mkdirs();
-					}
-					fos = new FileOutputStream(path);
-					//pr = new PrintWriter(fos);
-					osw = new OutputStreamWriter(fos);
+					path.mkdirs();
+					fos = new FileOutputStream(file);
+					pr = new PrintWriter(fos);
 					String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
-					osw.write(timestamp);
+					//fos.write(timestamp.getBytes());
+					pr.println(timestamp);
 				}catch(Exception e){e.printStackTrace();}
 				Log.v("Before ", " while loop");
+
 				while(running) {
 					byte[] frame = new byte[4]; // this -obsolete- format specifies
 					// 4 bytes per frame
@@ -84,7 +86,9 @@ class PollDataTask extends AsyncTask<Void, Void, String> {
 					int value2 = unsignedByteToInt(frame[2]);
 					output = value1 + "; " + value2 + "\r\n";
 					Log.v("In ", "while loop" + " " +value1 + " " +value2);
-					//pr.write(value1 +" " +value2);
+					String out = value1 + " " +value2 +"\n";
+					pr.println(value1 +" " +value2);
+					pr.flush();
 				}
 			}
 		} catch (Exception e) {
@@ -94,7 +98,17 @@ class PollDataTask extends AsyncTask<Void, Void, String> {
 			try {if (socket != null)socket.close();} catch (Exception e) {}
 			try {if (pr != null)pr.close();} catch (Exception e) {}
 			try {if (fos != null)fos.close();} catch (Exception e) {}
+
 		}
+		MediaScannerConnection.scanFile(activity,
+				new String[] { file.toString() }, null,
+				new MediaScannerConnection.OnScanCompletedListener() {
+					public void onScanCompleted(String path, Uri uri) {
+						Log.i("ExternalStorage", "Scanned " + path + ":");
+						Log.i("ExternalStorage", "-> uri=" + uri);
+					}
+				});
+
 		Log.v("After while", " loop");
 		return output;
 	}
