@@ -20,12 +20,14 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
 	public static final int REQUEST_ENABLE_BT = 42;
+	Button sendButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +41,15 @@ public class MainActivity extends Activity {
 			showToast("This device do not support Bluetooth");
 			this.finish();
 		}
+		sendButton = (Button) findViewById(R.id.sendButton);
 
+		sendButton.setOnClickListener(new View.OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+
+			}
+		});
 		//Android example
 
 

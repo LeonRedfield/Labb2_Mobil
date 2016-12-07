@@ -25,6 +25,7 @@ import android.util.Log;
 class PollDataTask extends AsyncTask<Void, Void, String> {
 
 	private boolean running;
+	private final static String FILENAME = "testfil.txt";
 
 
 	protected PollDataTask(MainActivity activity, BluetoothDevice noninDevice) {
@@ -49,7 +50,7 @@ class PollDataTask extends AsyncTask<Void, Void, String> {
 		OutputStream fos = null;
 		File path = Environment.getExternalStoragePublicDirectory(
 				Environment.DIRECTORY_DOWNLOADS);
-		File file = new File(path, "TestFil.txt");
+		File file = new File(path, FILENAME);
 		PrintWriter pr = null;
 		try {
 			socket = noninDevice
@@ -110,6 +111,11 @@ class PollDataTask extends AsyncTask<Void, Void, String> {
 				});
 
 		Log.v("After while", " loop");
+		ServerConnector sc = new ServerConnector("130.229.188.158");
+		File path1 = Environment.getExternalStoragePublicDirectory(
+				Environment.DIRECTORY_DOWNLOADS);
+		File file1 = new File(path, FILENAME);
+		sc.sendData(file);
 		return output;
 	}
 
@@ -124,6 +130,7 @@ class PollDataTask extends AsyncTask<Void, Void, String> {
 	 */
 	@Override
 	protected void onPostExecute(String output) {
+
 		activity.displayData(output);
 	}
 
@@ -142,4 +149,6 @@ class PollDataTask extends AsyncTask<Void, Void, String> {
 	private int unsignedByteToInt(byte b) {
 		return (int) b & 0xFF;
 	}
+
+
 }
