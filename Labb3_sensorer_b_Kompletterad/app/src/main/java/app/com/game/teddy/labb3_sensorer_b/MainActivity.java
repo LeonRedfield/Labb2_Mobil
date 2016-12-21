@@ -27,7 +27,9 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	public static final int REQUEST_ENABLE_BT = 42;
-	Button sendButton;
+	private static String value1, value2;
+
+	private TextView dataView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,21 +46,22 @@ public class MainActivity extends Activity {
 		//sendButton = (Button) findViewById(R.id.sendButton);
 
 		//sendButton.setOnClickListener(new View.OnClickListener(){
-/*
-			@Override
+
+			/*@Override
 			public void onClick(View v) {
 
 			}
 		});*/
 		//Android example
 
-
+		value1 = "";
+		value2 = "";
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		dataView.setText(R.string.data);
+		dataView.setText("Data2...");
 		initBluetooth();
 	}
 
@@ -130,7 +133,7 @@ public class MainActivity extends Activity {
 	private BluetoothAdapter bluetoothAdapter = null;
 	private BluetoothDevice noninDevice = null;
 
-	private TextView dataView;
+
 
 	void showToast(final CharSequence msg) {
 		Toast toast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
@@ -143,4 +146,6 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+
+
 }
